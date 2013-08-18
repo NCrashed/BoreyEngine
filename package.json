@@ -1,0 +1,45 @@
+{
+	"name": "borey-engine",
+	"description": "3D poly engine",
+	"homepage": "http://github.com/ncrashed/boreyengine",
+	"copyright": "Copyright © 2013, Gushcha Anton",
+	"license": "GPLv3",
+	"authors": 
+	[
+		"NCrashed (Gushcha Anton)"
+	],
+
+    "sourcePaths": 
+    [
+        "source/implement"
+    ], 
+    
+    "libs-posix": ["dl"],  
+    "targetType": "library",
+    "targetPath": "bin",
+    "targetName": "borey-engine",
+
+    "dependencies": 
+    {
+        "borey-engine:interface": "~master",
+        "derelict:opengl3": "~master",
+        "derelict:glfw3": "~master",
+        "derelict:util": "~master"
+    },
+
+    "subPackages":
+    [
+        {
+            "name": "interface",
+            "sourcePaths": 
+            [
+                "source/interface"
+            ],             
+            "targetType": "sourceLibrary",
+            "dependencies":
+            {
+                "derelict:util": "~master"
+            }
+        }
+    ]
+}

@@ -1,0 +1,22 @@
+{
+    "name": "borey-example-debug",
+    "description": "Debug example that used for debugging Borey Engine",
+    "homepage": "http://github.com/ncrashed/boreyengine",
+    "copyright": "Copyright © 2013, Gushcha Anton",
+    "license": "GPLv3",
+    "authors": 
+    [
+        "NCrashed (Gushcha Anton)"
+    ],
+
+    "libs-posix": ["dl"], 
+
+    "targetType": "executable",
+    "targetPath": "bin",
+
+    "dependencies": 
+    {
+        "borey-engine": "~master",
+        "borey-engine:interface": "~master",
+    }
+}
