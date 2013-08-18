@@ -13,11 +13,7 @@
     [
         "source/implement"
     ], 
-    
-    "libs-posix": ["dl"],  
-    "targetType": "library",
-    "targetPath": "bin",
-    "targetName": "borey-engine",
+    "libs-posix": ["dl"], 
 
     "dependencies": 
     {
@@ -40,6 +36,24 @@
             {
                 "derelict:util": "~master"
             }
+        }
+    ],
+
+    "configurations": 
+    [
+        {
+            "name": "application",
+             
+            "targetType": "library",
+            "targetPath": "bin",
+            "targetName": "borey-engine",
+        },
+        {
+            "name": "unittest",
+            "targetType": "executable",
+            "targetPath": "bin",
+            "targetName": "borey-tests",
+            "dflags": ["-main"]
         }
     ]
 }

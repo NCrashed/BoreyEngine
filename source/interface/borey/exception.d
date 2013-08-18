@@ -22,10 +22,28 @@
 module borey.exception;
 @safe:
 
+import borey.log;
+
+/**
+*   Base exception for Borey Engine.
+*/
 class BoreyException : Exception 
 {
-    this(string msg)
+    this(lazy string msg)
     {
+        super(msg);
+    }
+}
+
+/**
+*   This exception used for fatal errors, that
+*   have to be logged any way.
+*/
+class BoreyLoggedException : BoreyException
+{
+    this(shared ILogger logger, lazy string msg)
+    {
+        logger.logFatal(msg);
         super(msg);
     }
 }

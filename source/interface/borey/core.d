@@ -23,6 +23,10 @@
 module borey.core;
 @safe:
 
+import borey.log;
+import borey.video.window;
+import std.range;
+
 /**
 *   Main interface of the Borey Engine. It grands access to all engine
 *   subsystems.
@@ -46,4 +50,14 @@ interface IBoreyCore
         */
         bool supportManyWindows() @property;
     }
+
+    /**
+    *   Get default logger.
+    */
+    shared(ILogger) logger() @property;
+
+    /**
+    *   Range of created windows.
+    */
+    InputRange!IWindow windows() @property;
 }

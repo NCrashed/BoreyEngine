@@ -17,23 +17,15 @@
 */
 // This file is written in D programming language
 /**
-*   Debug example, changes occasionally.
+*   Module provides interface to work with natives windows.
 */
-module main;
+module borey.video.window;
+@safe:
 
-import borey.core;
-import borey.util.loader.loader;
-import std.stdio;
-
-int main(string[] args)
+/**
+*   Represents interface for window.
+*/
+interface IWindow
 {
-    auto boreyCore = initBoreyCore();
 
-    writeln(boreyCore.getVersion());
-    writeln(boreyCore.copyright);
-    writeln("Can engine handle many windows: ", boreyCore.supportManyWindows);
-
-    boreyCore.logger.logNotice("Hi, it is test log message!");
-
-    return 0;
 }

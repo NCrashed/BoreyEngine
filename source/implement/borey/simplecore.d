@@ -26,16 +26,25 @@ module borey.simplecore;
 import borey.core;
 import borey.exception;
 import borey.constants;
+import borey.log;
+import borey.stdlog;
+import borey.video.window;
 import derelict.glfw3.glfw3;
 import derelict.util.exception;
 import std.conv;
+import std.range;
+import core.time;
 
 /**
 *   The simpliest realization of IBoreyCore, which can handle only one
 *   window at the time. Based on GLFW3 library.
+*
+*   TODO: add check to trying initialize multiple cores!
 */
 class SimpleBoreyCore : IBoreyCore
 {
+    enum GENERAL_LOG_NAME = "general";
+
     pure nothrow const
     {
         /**
@@ -65,13 +74,52 @@ class SimpleBoreyCore : IBoreyCore
 
     this() @trusted
     {
+        mLogger = new shared CLogger(GENERAL_LOG_NAME);
+
         try
         {
             DerelictGLFW3.load();
         } 
         catch(DerelictException e)
         {
-            throw new BoreyException(text("Failed to load SimpleBoreyCore: failed to load GLFW3 library. Details: ", e.msg));
+            throw new BoreyLoggedException(mLogger, text("Failed to load SimpleBoreyCore: failed to load GLFW3 library. Details: ", e.msg));
+        }
+        mLogger.logNotice("[Core]: GLFW3 shared library loaded.");
+
+        if (!glfwInit())
+        {
+            throw new BoreyLoggedException(mLogger, "Failed to initialize GLFW3 library!");
         }
     }
+
+    /**
+    *   Get default logger.
+    */
+    shared(ILogger) logger() @property
+    {
+        return mLogger;
+    }
+
+    /**
+    *   Range of created windows.
+    */
+    InputRange!IWindow windows() @property @trusted
+    {
+        if(mWindow !is null)
+            return mWindow.only.inputRangeObject();
+        else
+            return takeNone!(IWindow[])().inputRangeObject();
+    }
+
+    protected
+    {
+        IWindow mWindow;
+        shared ILogger mLogger;
+    }
+}
+
+/// TODO: it is not clean, if nobody creates core it fails.
+@trusted shared static ~this() 
+{
+    glfwTerminate();
 }
