@@ -57,21 +57,16 @@ class GLFW3Window : IWindow
         this.logger = logger;
         this.winMonitor = monitor;
 
-        logger.logNotice("!");
-
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_RESIZABLE,  resizable);
         glfwWindowHint(GLFW_VISIBLE,    visible);
         glfwWindowHint(GLFW_DECORATED,  decorated);
 
-        logger.logNotice("!!");
         this.window = glfwCreateWindow(width, height, tittle.toStringz, monitor is null ? null : monitor.pointer, null);
         if(this.window is null)
         {
             throw new WindowException("[GLFW3Window]: Failed to create underlying glfw3 window!");
         }
-
-        logger.logNotice("!");
     }
 
     invariant()
@@ -528,8 +523,8 @@ class GLFW3Window : IWindow
         {
             try
             {
-                if(!!mFocusCangedDelegate)
-                    mFocusCangedDelegate(mCallbackWindowMap[ptr], flag == GL_TRUE ? true : false);
+                if(!!mFocusChangedDelegate)
+                    mFocusChangedDelegate(mCallbackWindowMap[ptr], flag == GL_TRUE ? true : false);
             }
             catch(Throwable th)
             {
@@ -540,8 +535,8 @@ class GLFW3Window : IWindow
 
         mCallbackWindowMap[window] = this;
         
-        auto old = mFocusCangedDelegate;
-        mFocusCangedDelegate = newDelegate;
+        auto old = mFocusChangedDelegate;
+        mFocusChangedDelegate = newDelegate;
         glfwSetWindowFocusCallback(window, cast(GLFWwindowfocusfun)&callback);
         return old;
     }
@@ -551,7 +546,7 @@ class GLFW3Window : IWindow
     */
     FocusChangedDelegate focusChangedDelegate() @property @trusted
     {
-        return mFocusCangedDelegate;
+        return mFocusChangedDelegate;
     }
 
     /**
@@ -563,8 +558,8 @@ class GLFW3Window : IWindow
         {
             try
             {
-                if(!!mFocusCangedDelegate)
-                    mFocusCangedDelegate(mCallbackWindowMap[ptr], flag == GL_TRUE ? true : false);
+                if(!!mMinimizedDelegate)
+                    mMinimizedDelegate(mCallbackWindowMap[ptr], flag == GL_TRUE ? true : false);
             }
             catch(Throwable th)
             {
@@ -575,8 +570,8 @@ class GLFW3Window : IWindow
 
         mCallbackWindowMap[window] = this;
         
-        auto old = mFocusCangedDelegate;
-        mFocusCangedDelegate = newDelegate;
+        auto old = mMinimizedDelegate;
+        mMinimizedDelegate = newDelegate;
         glfwSetWindowIconifyCallback(window, cast(GLFWwindowiconifyfun)&callback);
         return old;
     }
@@ -605,7 +600,7 @@ class GLFW3Window : IWindow
             FramebufferSizeChangedDelegate mFramebufferSizeChangedDelegate;
             RefreshDelegate mRefreshDelegate;
             CloseDelegate mCloseDelegate;
-            FocusChangedDelegate mFocusCangedDelegate;
+            FocusChangedDelegate mFocusChangedDelegate;
             MinimizedDelegate mMinimizedDelegate;
 
             // to retrieve from C callbacks
