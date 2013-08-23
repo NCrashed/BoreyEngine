@@ -25,6 +25,7 @@ module borey.core;
 
 import borey.log;
 import borey.video.window;
+import borey.video.monitor;
 import std.range;
 
 /**
@@ -52,6 +53,11 @@ interface IBoreyCore
     }
 
     /**
+    *   Closes all underlying resources.
+    */
+    void terminate();
+
+    /**
     *   Get default logger.
     */
     shared(ILogger) logger() @property;
@@ -60,4 +66,81 @@ interface IBoreyCore
     *   Range of created windows.
     */
     InputRange!IWindow windows() @property;
+
+    /**
+    *   Creates window with specified size (sizex, sizey) and title. If makeCurrent is true,
+    *   contex of the window becomes current, and you can draw on it immidiately.
+    *   If not null monitor parameter is passed, window will become fullscreen on that monitor.
+    *
+    *   Warning: Actual size of window may be different especially for fullscreen mode.
+    *   Notes: Throws WindowException on errors.
+    *   Notes: This realization recreates window on following calls.
+    *
+    *   Params:
+    *   logger = Logger to use,
+    *   width = window width, can be adjusted for fullscreen window;
+    *   height = window height, can be adjusted for fullscreen window;
+    *   tittle = window tittle;
+    *   monitor = if not null, window will be fullscreen on this monitor;
+    *   resizable = should be window size resizable;
+    *   visible = if true, window will be created and showed immidietly;
+    *   decorated = if false, window head and control buttons won't be created.
+    *
+    *   Warning: Window should be created in main thread.
+    */
+    IWindow createWindow(uint width, uint height, string title, IMonitor monitor = null, bool makeCurrent = true,
+        bool resizable = false, bool visible = true, bool decorated = true);
+
+    /**
+    *   Drops current drawing context binded to any window.
+    *   Used to detach context before destroying windows.
+    */
+    void clearCurrentContext();
+
+    /**
+    *   Gets current binded context or null if none is binded.
+    */
+    IWindow getCurrentContext();
+
+    /**
+    *   Returns main monitor of the pc.
+    */
+    IMonitor primaryMonitor() @property;
+
+    /**
+    *   Returns a range of available monitors.
+    */
+    InputRange!IMonitor monitors() @property;
+
+    /**
+    *   Enum describes events that can be passed to on change delegate.
+    *   See_also: OnMonitorChangeDelegate, onMonitorChangeCallback
+    */
+    enum MONITOR_EVENT
+    {
+        CONNECTED,
+        DISCONNECTED
+    }
+
+    /**
+    *   Delegate type used by property onMonitorChangeCallback.
+    */
+    alias void delegate(IMonitor, MONITOR_EVENT) OnMonitorChangeDelegate;
+
+    /**
+    *   Setups delegate which will be called when the monitor
+    *   disconnected or connected to system.
+    */
+    void onMonitorChangeCallback(OnMonitorChangeDelegate deleg) @property;
+
+    /**
+    *   Returns current delegate for on change events.
+    *   See_also: onMonitorChangeCallback(OnMonitorChangeDelegate)
+    */
+    OnMonitorChangeDelegate onMonitorChangeCallback() const @property;
+
+    /**
+    *   Processes only those events that have already been received and then returns immediately. 
+    */
+    void pollEvents();
 }
