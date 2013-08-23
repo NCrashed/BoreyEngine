@@ -26,6 +26,7 @@ import std.stdio;
 import std.file;
 import std.conv;
 import std.datetime;
+import std.traits;
 
 /**
 *   Standarg implementation of ILogger interface.
@@ -57,7 +58,7 @@ synchronized class CLogger : ILogger
         *   Prints message into log. Displaying in the console
         *   controled by minOutputLevel property.
         */
-        void log(lazy string message, ELOG_LEVEL level) @trusted
+        void log(lazy string message, ELOG_LEVEL level) const @trusted
         {
             scope(failure) {}
 
@@ -78,7 +79,7 @@ synchronized class CLogger : ILogger
         /*
         *   Returns: minimum log level,  will be printed in the console.
         */
-        ELOG_LEVEL minOutputLevel() @property @trusted
+        ELOG_LEVEL minOutputLevel() const @property @trusted
         {
             return mMinOutputLevel;
         }

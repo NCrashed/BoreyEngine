@@ -57,13 +57,16 @@ interface ILogger
         /**
         *   Prints message into log. Displaying in the console
         *   controled by minOutputLevel property.
+        *
+        *   Notes: const modificator needed to log into const
+        *   methods, though method changes output streams state.
         */
-        void log(lazy string message, ELOG_LEVEL level);
+        void log(lazy string message, ELOG_LEVEL level) const;
 
         /*
         *   Returns: minimum log level,  will be printed in the console.
         */
-        ELOG_LEVEL minOutputLevel() @property;
+        ELOG_LEVEL minOutputLevel() const @property;
 
         /*
         *   Setups minimum log level, 
@@ -71,30 +74,35 @@ interface ILogger
         void minOutputLevel(ELOG_LEVEL level) @property;
     }
 
+
+    /**
+    *   Wrapper for handy debug messages.
+    *   Warning: main purpose for debug messages, thus it is not lazy.
+    */
+    final void logDebug(E...)(E args) const @trusted
+    {
+        scope(failure) {}
+        debug
+        {
+            string str = text(args);
+            log(str, ELOG_LEVEL.DEBUG);
+        }
+    }
+
     // wrappers for easy logging
     final nothrow synchronized  @trusted
     {
-        /**
-        *   Wrapper for handy debug messages.
-        *   Warning: main purpose for debug messages, thus it is not lazy.
-        */
-        void logDebug(ELOG_LEVEL level = ELOG_LEVEL.DEBUG, E...)(E args)
-        {
-            scope(failure) {}
-            log(text(args), level);
-        }
-
-        void logNotice(lazy string message)
+        void logNotice(lazy string message) const
         {
             log(message, ELOG_LEVEL.NOTICE);
         }
 
-        void logWarning(lazy string message) 
+        void logWarning(lazy string message) const
         {
             log(message, ELOG_LEVEL.WARNING);
         }
 
-        void logFatal(lazy string message)
+        void logFatal(lazy string message) const
         {
             log(message, ELOG_LEVEL.FATAL);
         }

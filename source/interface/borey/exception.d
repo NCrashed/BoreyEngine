@@ -41,9 +41,82 @@ class BoreyException : Exception
 */
 class BoreyLoggedException : BoreyException
 {
-    this(shared ILogger logger, lazy string msg)
+    this(shared const ILogger logger, lazy string msg)
     {
         logger.logFatal(msg);
         super(msg);
     }
 }
+
+/**
+*   Handy way to handle exception in C callbacks. Taked from
+*   http://www.gamedev.net/page/resources/_/technical/general-programming/d-exceptions-and-c-callbacks-r3323
+*   Author: Walter Bright
+*/
+class CallbackThrowable : Throwable 
+{
+    // This is for the previously saved CallbackThrowable, if any.
+    CallbackThrowable nextCT;
+
+    // The file and line params aren't strictly necessary, but they are good
+    // for debugging.
+    this( Throwable payload, CallbackThrowable t,
+            string file = __FILE__, size_t line = __LINE__ ) 
+    {
+        // Call the superclass constructor that takes file and line info,
+        // and make the wrapped exception part of this exception's chain.
+        super( "An exception was thrown from a C callback.", file, line, payload );
+
+        // Store a reference to the previously saved CallbackThrowable
+        nextCT = t;
+    }
+    
+    // This method aids in propagating non-Exception throwables up the callstack.
+    void throwWrappedError() 
+    {
+        // Test if the wrapped Throwable is an instance of Exception and throw it
+        // if it isn't. This will cause Errors and any other non-Exception Throwable
+        // to be rethrown.
+        if( cast( Exception )next is null ) 
+        {
+            throw next;
+        }
+    }
+
+    /**
+    *   Wrapper for other modules that only defines callbacks but aren't
+    *   able to extract chain by themself.
+    */
+    static synchronized void storeCallbackThrowable(Throwable payload,
+                string file = __FILE__, size_t line = __LINE__) @trusted
+    {
+        _rethrow = new CallbackThrowable(payload, _rethrow, file, line);
+    }
+
+    /**
+    *   Checks chain of stored callback exceptions and errors and 
+    *   throws them.
+    */
+    static synchronized void rethrowCallbackThrowables() @trusted
+    {
+        if( _rethrow !is null ) 
+        {
+            // Loop through each CallbackThrowable in the chain and rethrow the first
+            // non-Exception throwable encountered.    
+            for( auto ct = _rethrow; ct !is null; ct = ct.nextCT ) 
+            {
+                ct.throwWrappedError();
+            }
+            
+            // No Errors were caught, so all we have are Exceptions.
+            // Throw the saved CallbackThrowable.
+            auto t = _rethrow;
+            _rethrow = null;
+            throw t;
+        }    
+    }  
+    
+    private static __gshared CallbackThrowable _rethrow;
+}
+
+
