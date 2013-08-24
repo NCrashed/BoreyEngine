@@ -1,0 +1,30 @@
+{
+	"folders":
+	[
+		{
+			"path": "source"
+		}
+	],
+    "build_systems":
+    [
+        {
+            "name": "Dub",
+            "working_dir": "$project_path",
+            "cmd": ["dub", "build"],
+
+            "variants": 
+            [
+                { 
+                    "name": "Dub unittests",
+                    "working_dir": "$project_path",
+                    "cmd": ["dub", "build", "--build=unittest"]
+                },
+                { 
+                    "name": "Debug example",
+                    "working_dir": "$project_path/source/examples/debugExample",
+                    "cmd": ["dub", "build"]
+                }  
+            ]            
+        }
+    ]
+}

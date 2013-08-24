@@ -1,0 +1,11 @@
+#############
+## Borey
+#############
+*.a
+*.lib
+*.so
+*.dll
+*.lnk
+*.log
+*.exe
+*.sublime-workspace
