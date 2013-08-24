@@ -38,30 +38,7 @@ int main(string[] args)
     boreyCore.logger.logNotice("Hi, it is test log message!");
 
     auto window = boreyCore.createWindow(640, 480, "Test window");
-    
-    window.posChangedDelegate = 
-        (win, x, y) @trusted => boreyCore.logger.logNotice(text("Window pos is now: (",x,",",y,")"));
-    
-    window.sizeChangedDelegate = 
-        (win, width, height) @trusted => boreyCore.logger.logNotice(text("Window size is now: (", width, ",", height, ")"));
-    
-    window.framebufferSizeChangedDelegate =
-        (win, width, height) @trusted => boreyCore.logger.logNotice(text("Window framebuffer size is now: (", width, ",", height, ")"));
-   
-    window.closeDelegate = 
-        (win) @trusted => boreyCore.logger.logNotice(text("Window is closing!"));
 
-    window.focusChangedDelegate = 
-        (win, flag) @trusted => boreyCore.logger.logNotice(text("Window focused: ", flag));
-    
-    window.minimizedDelegate = 
-        (win, flag) @trusted => boreyCore.logger.logNotice(text("Window iconified: ", flag));
-
-    while(!window.shouldBeClosed)
-    {
-        window.swapBuffers();
-        boreyCore.pollEvents();
-    }
-
+    boreyCore.runEventLoop();
     return 0;
 }

@@ -294,6 +294,37 @@ class SimpleBoreyCore : IBoreyCore
     }
 
     /**
+    *   If value is true, event loop in method runEventLoop() should close all windows and return
+    *   at next loop iteration.
+    */
+    void shouldExit(bool value) @property
+    {
+        mShouldExit = value;
+    }
+
+    /**
+    *   If value is true, event loop in method runEventLoop() should close all windows and return
+    *   at next loop iteration.
+    */
+    bool shouldExit() @property
+    {
+        return mShouldExit;
+    }
+
+    /**
+    *   Begins infinite loop of event processing and drawing. Exits when all windows are closed
+    *   or shouldExit flag is set to true.
+    */
+    void runEventLoop()
+    {
+        while(!mWindow.shouldBeClosed && !shouldExit)
+        {
+            mWindow.swapBuffers();
+            pollEvents();
+        }
+    }
+
+    /**
     *   Returns current delegate for on change events.
     *   See_also: onMonitorChangeCallback(OnMonitorChangeDelegate)
     */
@@ -306,6 +337,7 @@ class SimpleBoreyCore : IBoreyCore
     {
         IWindow mWindow;
         static shared ILogger mLogger;
+        bool mShouldExit = false;
     }
     private
     {

@@ -143,4 +143,22 @@ interface IBoreyCore
     *   Processes only those events that have already been received and then returns immediately. 
     */
     void pollEvents();
+
+    /**
+    *   If value is true, event loop in method runEventLoop() should close all windows and return
+    *   at next loop iteration.
+    */
+    void shouldExit(bool value) @property;
+
+    /**
+    *   If value is true, event loop in method runEventLoop() should close all windows and return
+    *   at next loop iteration.
+    */
+    bool shouldExit() @property;
+
+    /**
+    *   Begins infinite loop of event processing and drawing. Exits when all windows are closed
+    *   or shouldExit flag is set to true.
+    */
+    void runEventLoop();
 }
