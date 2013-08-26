@@ -322,6 +322,9 @@ class SimpleBoreyCore : IBoreyCore
             mWindow.swapBuffers();
             pollEvents();
         }
+
+        if(mWindow.closeDelegate !is null)
+            mWindow.closeDelegate()(mWindow);
     }
 
     /**

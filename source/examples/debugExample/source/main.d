@@ -22,6 +22,7 @@
 module main;
 
 import borey.core;
+import borey.keyboard;
 import borey.util.loader.loader;
 import std.stdio;
 import std.conv;
@@ -38,6 +39,30 @@ int main(string[] args)
     boreyCore.logger.logNotice("Hi, it is test log message!");
 
     auto window = boreyCore.createWindow(640, 480, "Test window");
+
+    // Binding exit event
+    window.keyboardDelegate =
+        (win, state) @trusted
+        {
+            if(state.key == Key.ESCAPE) 
+                boreyCore.shouldExit = true;
+        };
+
+    // test
+    window.charInputDelegate =
+        (win, ch) @trusted => boreyCore.logger.logNotice(text("Unicode input: ", ch));
+
+    window.cursorEnterDelegate = 
+        (win, flag) @trusted => boreyCore.logger.logNotice(text("Cursor enters/leaving window: ", flag));
+
+    window.cursorPosDelegate =
+        (win, x, y) @trusted => boreyCore.logger.logNotice(text("Cursor position: ", x, ",", y));
+
+    window.mouseButtonDelegate =
+        (win, state) @trusted => boreyCore.logger.logNotice(text("Mouse button event: ", state.button, " pos: ", state.position));
+
+    window.scrollDelegate =
+        (win, xoffset, yoffset) @trusted => boreyCore.logger.logNotice(text("Scrolling event: ", xoffset, ",", yoffset));
 
     boreyCore.runEventLoop();
     return 0;

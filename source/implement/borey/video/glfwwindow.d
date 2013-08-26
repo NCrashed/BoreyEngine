@@ -24,6 +24,7 @@ module borey.video.glfwwindow;
 
 import borey.exception;
 import borey.log;
+import borey.glfwkeymap;
 import borey.video.window;
 import borey.video.monitor;
 import borey.video.glfwmonitor;
@@ -31,6 +32,7 @@ import borey.util.vector;
 import derelict.glfw3.glfw3;
 import derelict.opengl3.constants : GL_TRUE;
 import std.string;
+import std.conv;
 
 class GLFW3Window : IWindow
 {
@@ -584,6 +586,216 @@ class GLFW3Window : IWindow
         return mMinimizedDelegate;
     }
 
+    /**
+    *   Setups new delegate for window unicode input event. Returns old delegate or null.
+    */
+    CharInputDelegate charInputDelegate(CharInputDelegate newDelegate) @property @trusted
+    {
+        extern(C) void callback(GLFWwindow* ptr, uint unicode)
+        {
+            try
+            {
+                if(!!mCharInputDelegate)
+                    mCharInputDelegate(mCallbackWindowMap[ptr], to!char(unicode));
+            }
+            catch(Throwable th)
+            {
+                // Save a new CallbackThrowable that wraps t and chains _rethrow.
+                CallbackThrowable.storeCallbackThrowable(th);
+            }            
+        }
+
+        mCallbackWindowMap[window] = this;
+        
+        auto old = mCharInputDelegate;
+        mCharInputDelegate = newDelegate;
+        glfwSetCharCallback(window, cast(GLFWcharfun)&callback);
+        return old;
+    }
+
+    /**
+    *   Returns current delegated for window unicode input event.
+    */
+    CharInputDelegate charInputDelegate() @property @trusted
+    {
+        return mCharInputDelegate;
+    }
+
+    /**
+    *   Setups new delegate for cursor entering/leaving event. Returns old delegate or null.
+    */
+    CursorEnterDelegate cursorEnterDelegate(CursorEnterDelegate newDelegate) @property @trusted
+    {
+        extern(C) void callback(GLFWwindow* ptr, int flag)
+        {
+            try
+            {
+                if(!!mCursorEnterDelegate)
+                    mCursorEnterDelegate(mCallbackWindowMap[ptr], flag == GL_TRUE ? true : false);
+            }
+            catch(Throwable th)
+            {
+                // Save a new CallbackThrowable that wraps t and chains _rethrow.
+                CallbackThrowable.storeCallbackThrowable(th);
+            }            
+        }
+
+        mCallbackWindowMap[window] = this;
+        
+        auto old = mCursorEnterDelegate;
+        mCursorEnterDelegate = newDelegate;
+        glfwSetCursorEnterCallback(window, cast(GLFWcursorenterfun)&callback);
+        return old;
+    }
+
+    /**
+    *   Returns current delegated for cursor entering/leaving event.
+    */
+    CursorEnterDelegate cursorEnterDelegate() @property @trusted
+    {
+        return mCursorEnterDelegate;
+    }
+
+    /**
+    *   Setups new delegate for cursor position changing event. Returns old delegate or null.
+    */
+    CursorPosDelegate cursorPosDelegate(CursorPosDelegate newDelegate) @property @trusted
+    {
+        extern(C) void callback(GLFWwindow* ptr, double x, double y)
+        {
+            try
+            {
+                if(!!mCursorPosDelegate)
+                    mCursorPosDelegate(mCallbackWindowMap[ptr], x, y);
+            }
+            catch(Throwable th)
+            {
+                // Save a new CallbackThrowable that wraps t and chains _rethrow.
+                CallbackThrowable.storeCallbackThrowable(th);
+            }            
+        }
+
+        mCallbackWindowMap[window] = this;
+        
+        auto old = mCursorPosDelegate;
+        mCursorPosDelegate = newDelegate;
+        glfwSetCursorPosCallback(window, cast(GLFWcursorposfun)&callback);
+        return old;
+    }
+
+    /**
+    *   Returns current delegated for cursor position changing event.
+    */
+    CursorPosDelegate cursorPosDelegate() @property @trusted
+    {
+        return mCursorPosDelegate;
+    }
+
+    /**
+    *   Setups new delegate for key pressing/releasing/repeating event. Returns old delegate or null.
+    */
+    KeyDelegate keyboardDelegate(KeyDelegate newDelegate) @property @trusted
+    {
+        extern(C) void callback(GLFWwindow* ptr, int key, int scancode, int action, int mods)
+        {
+            try
+            {
+                if(!!mKeyDelegate)
+                    mKeyDelegate(mCallbackWindowMap[ptr], fromGLFWKeyState(key, scancode, action, mods));
+            }
+            catch(Throwable th)
+            {
+                // Save a new CallbackThrowable that wraps t and chains _rethrow.
+                CallbackThrowable.storeCallbackThrowable(th);
+            }            
+        }
+
+        mCallbackWindowMap[window] = this;
+        
+        auto old = mKeyDelegate;
+        mKeyDelegate = newDelegate;
+        glfwSetKeyCallback(window, cast(GLFWkeyfun)&callback);
+        return old;
+    }
+
+    /**
+    *   Returns current delegated for key pressing/releasing/repeating event.
+    */
+    KeyDelegate keyboardDelegate() @property @trusted
+    {
+        return mKeyDelegate;
+    }
+
+    /**
+    *   Setups new delegate for mouse button pressing/releasing event. Returns old delegate or null.
+    */
+    MouseButtonDelegate mouseButtonDelegate(MouseButtonDelegate newDelegate) @property @trusted
+    {
+        extern(C) void callback(GLFWwindow* ptr, int button, int action, int mods)
+        {
+            try
+            {
+                if(!!mMouseButtonDelegate)
+                    mMouseButtonDelegate(mCallbackWindowMap[ptr], fromGLFWButtonState(button, action, mods));
+            }
+            catch(Throwable th)
+            {
+                // Save a new CallbackThrowable that wraps t and chains _rethrow.
+                CallbackThrowable.storeCallbackThrowable(th);
+            }            
+        }
+
+        mCallbackWindowMap[window] = this;
+        
+        auto old = mMouseButtonDelegate;
+        mMouseButtonDelegate = newDelegate;
+        glfwSetMouseButtonCallback(window, cast(GLFWmousebuttonfun)&callback);
+        return old;        
+    }    
+
+    /**
+    *   Returns current delegated for mouse button pressing/releasing event.
+    */
+    MouseButtonDelegate mouseButtonDelegate() @property @trusted
+    {
+        return mMouseButtonDelegate;
+    }
+
+    /**
+    *   Setups new delegate for window scrolling event. Returns old delegate or null.
+    */
+    ScrollDelegate scrollDelegate(ScrollDelegate newDelegate) @property @trusted
+    {
+        extern(C) void callback(GLFWwindow* ptr, double xoffset, double yoffset)
+        {
+            try
+            {
+                if(!!mScrollDelegate)
+                    mScrollDelegate(mCallbackWindowMap[ptr], xoffset, yoffset);
+            }
+            catch(Throwable th)
+            {
+                // Save a new CallbackThrowable that wraps t and chains _rethrow.
+                CallbackThrowable.storeCallbackThrowable(th);
+            }            
+        }
+
+        mCallbackWindowMap[window] = this;
+        
+        auto old = mScrollDelegate;
+        mScrollDelegate = newDelegate;
+        glfwSetScrollCallback(window, cast(GLFWscrollfun)&callback);
+        return old;   
+    }
+
+    /**
+    *   Returns current delegated for window scrolling event.
+    */
+    ScrollDelegate scrollDelegate() @property @trusted
+    {
+        return mScrollDelegate;
+    }
+
     private
     {
         GLFWwindow* window;
@@ -595,13 +807,19 @@ class GLFW3Window : IWindow
 
         __gshared
         {
-            PosChangedDelegate mPosChangedDelegate;
-            SizeChangedDelegate mSizeChangedDelegate;
-            FramebufferSizeChangedDelegate mFramebufferSizeChangedDelegate;
-            RefreshDelegate mRefreshDelegate;
-            CloseDelegate mCloseDelegate;
-            FocusChangedDelegate mFocusChangedDelegate;
-            MinimizedDelegate mMinimizedDelegate;
+            PosChangedDelegate              mPosChangedDelegate;
+            SizeChangedDelegate             mSizeChangedDelegate;
+            FramebufferSizeChangedDelegate  mFramebufferSizeChangedDelegate;
+            RefreshDelegate                 mRefreshDelegate;
+            CloseDelegate                   mCloseDelegate;
+            FocusChangedDelegate            mFocusChangedDelegate;
+            MinimizedDelegate               mMinimizedDelegate;
+            CharInputDelegate               mCharInputDelegate;
+            CursorEnterDelegate             mCursorEnterDelegate;
+            CursorPosDelegate               mCursorPosDelegate;
+            KeyDelegate                     mKeyDelegate;
+            MouseButtonDelegate             mMouseButtonDelegate;
+            ScrollDelegate                  mScrollDelegate;
 
             // to retrieve from C callbacks
             static IWindow[GLFWwindow*] mCallbackWindowMap;

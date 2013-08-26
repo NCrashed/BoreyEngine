@@ -23,6 +23,8 @@ module borey.video.window;
 @safe:
 
 import borey.exception;
+import borey.keyboard;
+import borey.mouse;
 import borey.video.monitor;
 import borey.util.vector;
 
@@ -330,8 +332,26 @@ interface IWindow
     /// Called when window iconfied/restored
     alias void delegate(IWindow window, bool minimized) MinimizedDelegate;
 
+    /// Called when unicode character
+    alias void delegate(IWindow window, char unicode) CharInputDelegate;
+
+    /// Called when cursor enters/leaves window
+    alias void delegate(IWindow window, bool enters) CursorEnterDelegate;
+
+    /// Called when cursor changes it position
+    alias void delegate(IWindow window, double x, double y) CursorPosDelegate;
+
+    /// Called when keyboard key is pressed/released/repeated
+    alias void delegate(IWindow window, KeyState keyState) KeyDelegate;
+
+    /// Called when mouse button is pressed/released
+    alias void delegate(IWindow window, MouseButtonState buttonState) MouseButtonDelegate;
+
+    /// Called when window is scrolled
+    alias void delegate(IWindow window, double xoffset, double yoffset) ScrollDelegate;
+    
     /**
-    *   Setups new delegate to position changing event. Returns old delegate or null.
+    *   Setups new delegate for position changing event. Returns old delegate or null.
     */
     PosChangedDelegate posChangedDelegate(PosChangedDelegate newDelegate) @property;
 
@@ -341,7 +361,7 @@ interface IWindow
     PosChangedDelegate posChangedDelegate() @property;
 
     /**
-    *   Setups new delegate to window size changing event. Returns old delegate or null.
+    *   Setups new delegate for window size changing event. Returns old delegate or null.
     */
     SizeChangedDelegate sizeChangedDelegate(SizeChangedDelegate newDelegate) @property;
 
@@ -351,7 +371,7 @@ interface IWindow
     SizeChangedDelegate sizeChangedDelegate() @property;
 
     /**
-    *   Setups new delegate to framebuffer size changing event. Returns old delegate or null.
+    *   Setups new delegate for framebuffer size changing event. Returns old delegate or null.
     */
     FramebufferSizeChangedDelegate framebufferSizeChangedDelegate(FramebufferSizeChangedDelegate newDelegate) @property;
 
@@ -361,7 +381,7 @@ interface IWindow
     FramebufferSizeChangedDelegate framebufferSizeChangedDelegate() @property;   
 
     /**
-    *   Setups new delegate to window refreshing event. Returns old delegate or null.
+    *   Setups new delegate for window refreshing event. Returns old delegate or null.
     */
     RefreshDelegate refreshDelegate(RefreshDelegate newDelegate) @property;
 
@@ -371,7 +391,7 @@ interface IWindow
     RefreshDelegate refreshDelegate() @property;
 
     /**
-    *   Setups new delegate to window closing event. Returns old delegate or null.
+    *   Setups new delegate for window closing event. Returns old delegate or null.
     */
     CloseDelegate closeDelegate(CloseDelegate newDelegate) @property;
 
@@ -381,7 +401,7 @@ interface IWindow
     CloseDelegate closeDelegate() @property;
 
     /**
-    *   Setups new delegate to window focusing changing event. Returns old delegate or null.
+    *   Setups new delegate for window focusing changing event. Returns old delegate or null.
     */
     FocusChangedDelegate focusChangedDelegate(FocusChangedDelegate newDelegate) @property;
 
@@ -391,7 +411,7 @@ interface IWindow
     FocusChangedDelegate focusChangedDelegate() @property;
 
     /**
-    *   Setups new delegate to window iconify/restore event. Returns old delegate or null.
+    *   Setups new delegate for window iconify/restore event. Returns old delegate or null.
     */
     MinimizedDelegate minimizedDelegate(MinimizedDelegate newDelegate) @property;
 
@@ -399,4 +419,64 @@ interface IWindow
     *   Returns current delegated for window iconify/restore changing event.
     */
     MinimizedDelegate minimizedDelegate() @property;
+
+    /**
+    *   Setups new delegate for window unicode input event. Returns old delegate or null.
+    */
+    CharInputDelegate charInputDelegate(CharInputDelegate newDelegate) @property;
+
+    /**
+    *   Returns current delegated for window unicode input event.
+    */
+    CharInputDelegate charInputDelegate() @property;
+
+    /**
+    *   Setups new delegate for cursor entering/leaving event. Returns old delegate or null.
+    */
+    CursorEnterDelegate cursorEnterDelegate(CursorEnterDelegate newDelegate) @property;
+
+    /**
+    *   Returns current delegated for cursor entering/leaving event.
+    */
+    CursorEnterDelegate cursorEnterDelegate() @property;
+
+    /**
+    *   Setups new delegate for cursor position changing event. Returns old delegate or null.
+    */
+    CursorPosDelegate cursorPosDelegate(CursorPosDelegate newDelegate) @property;
+
+    /**
+    *   Returns current delegated for cursor position changing event.
+    */
+    CursorPosDelegate cursorPosDelegate() @property;
+
+    /**
+    *   Setups new delegate for key pressing/releasing/repeating event. Returns old delegate or null.
+    */
+    KeyDelegate keyboardDelegate(KeyDelegate newDelegate) @property;
+
+    /**
+    *   Returns current delegated for key pressing/releasing/repeating event.
+    */
+    KeyDelegate keyboardDelegate() @property;
+
+    /**
+    *   Setups new delegate for mouse button pressing/releasing event. Returns old delegate or null.
+    */
+    MouseButtonDelegate mouseButtonDelegate(MouseButtonDelegate newDelegate) @property;
+
+    /**
+    *   Returns current delegated for mouse button pressing/releasing event.
+    */
+    MouseButtonDelegate mouseButtonDelegate() @property;
+
+    /**
+    *   Setups new delegate for window scrolling event. Returns old delegate or null.
+    */
+    ScrollDelegate scrollDelegate(ScrollDelegate newDelegate) @property;
+
+    /**
+    *   Returns current delegated for window scrolling event.
+    */
+    ScrollDelegate scrollDelegate() @property;  
 }

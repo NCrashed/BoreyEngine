@@ -23,6 +23,7 @@
 module main;
 
 import borey.core;
+import borey.keyboard;
 import borey.util.loader.loader;
 import std.stdio;
 import std.conv;
@@ -35,9 +36,17 @@ int main(string[] args)
     scope(exit) boreyCore.terminate();
 
     // Create window
-    auto window = boreyCore.createWindow(640, 480, "Test window");
+    //auto window = boreyCore.createWindow(640, 480, "Test window");
     // Example for fullscreen
-    //auto window = boreyCore.createWindow(640, 480, "Test window", boreyCore.primaryMonitor());
+    auto window = boreyCore.createWindow(640, 480, "Test window", boreyCore.primaryMonitor());
+
+    // Binding exit event
+    window.keyboardDelegate =
+        (win, state) @trusted
+        {
+            if(state.key == Key.ESCAPE) 
+                boreyCore.shouldExit = true;
+        };
 
     // Binding delegates for window events
     window.posChangedDelegate = 
