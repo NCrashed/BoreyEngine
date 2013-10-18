@@ -35,8 +35,8 @@ import std.conv;
 */
 private enum TEST_DELTA = 0.0001;
 
-const Quaternion ZERO_QUATERNION = Quaternion(0,0,0,0);
-const Quaternion UNIT_QUATERNION = Quaternion(1,0,0,0);
+private immutable Quaternion ZERO_QUATERNION = Quaternion(0,0,0,0);
+private immutable Quaternion UNIT_QUATERNION = Quaternion(1,0,0,0);
 
 /// Mathematic object to descirbe rotations.
 struct Quaternion
@@ -48,6 +48,22 @@ struct Quaternion
 
     pure nothrow
     {
+        /**
+        *   Returns quaternion filled with zeros.
+        */
+        static Quaternion ZERO() @property
+        {
+            return ZERO_QUATERNION;
+        }
+
+        /**
+        *   Returns quaternion presenting no rotation.
+        */
+        static Quaternion UNIT() @property
+        {
+            return UNIT_QUATERNION;
+        }
+
         /// Default constructor
         this(double x, double y, double z, double w)
         {

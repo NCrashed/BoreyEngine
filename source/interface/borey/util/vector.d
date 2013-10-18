@@ -53,11 +53,6 @@ alias Vector!(size_t, 4) vector4dst;
 alias Vector!(size_t, 3) vector3dst;
 alias Vector!(size_t, 2) vector2dst;
 
-immutable ZUNIT = vector3df(0,0,1);
-immutable XUNIT = vector3df(1,0,0);
-immutable YUNIT = vector3df(0,1,0);
-immutable ZVEC = vector3df(0,0,0);
-
 private T[size] initArray(T,int size)(T value)
 {
     T ret[size];
@@ -98,12 +93,36 @@ struct Vector(StType, uint size)
 
     alias Vector!(StType, size) thistype;
 
+    // Handy wrapers for 3d vectors
+    static if(size == 3)
+    {
+        static thistype XUNIT() @property
+        {
+            return thistype(1, 0, 0);
+        }
+
+        static thistype YUNIT() @property
+        {
+            return thistype(0, 1, 0);
+        }
+
+        static thistype ZUNIT() @property
+        {
+            return thistype(0, 0, 1);
+        }
+
+        static thistype ZERO() @property
+        {
+            return thistype(0, 0, 0);
+        }
+    }
+
     /**
-    *   TODO: When to become pure, make this pure.
+    *   TODO: When 'to' become pure, make this pure.
     */
     this(StType[] vals...) @trusted
     {
-        assert(vals.length == size, "Passed wrong arguments count to "~thistype.stringof~" constructor! Needed: "~to!string(size)~", but geted: "~to!string(vals.length));
+        assert(vals.length == size, "Passed wrong arguments count to "~thistype.stringof~" constructor! Needed: "~to!string(size)~", but got: "~to!string(vals.length));
         foreach(i,ref val; m)
             val = vals[i];
     }

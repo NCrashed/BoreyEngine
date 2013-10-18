@@ -75,8 +75,10 @@ module borey.util.common;
 
 import std.math;
 import std.traits;
-import std.algorithm : countUntil;
+import std.algorithm;
 import std.typetuple;
+import std.container;
+import std.range;
 
 /// fromStringz
 /**
@@ -947,4 +949,140 @@ unittest
     static assert(is(ArrayElementType!(string[]) == string));
     static assert(is(ArrayElementType!(shared bool[]) == shared bool));
     static assert(is(ArrayElementType!(bool[]) == bool));
+}
+
+/**
+*   Flats range of ranges into one range.
+*
+*   TODO: Asserts error on empty arrays flattering.
+*
+*   Example:
+*   --------
+*    auto first = DList!int([0, 1, 2]);
+*    auto second = DList!int([3, 4, 5]);
+*    
+*    assert(flatten(DList!(DList!(int).Range)([first[], second[]])[]).equal([0, 1, 2, 3, 4, 5]));
+*    assert(flatten(DList!(DList!(int).Range)()[]).empty);
+*   --------
+*/
+auto flatten(Range)(Range range)
+    if(isInputRange!Range && isInputRange!(typeof(range.front)))
+{
+    alias typeof(Range.front) SubRange;
+
+    static if(isArray!SubRange)
+    {
+        alias ArrayElementType!SubRange SubRangeElement;
+
+        struct Result
+        {
+            private SubRange current;
+            bool wasEmpty = false;
+            size_t index;
+
+            this(ref Range range)
+            {
+                if(range.empty)
+                    wasEmpty = true;
+                else
+                {
+                    current = range.front;
+                    while(current.empty)
+                    {
+                        range.popFront();
+                        if(range.empty)
+                        {
+                            wasEmpty = true;
+                            break;
+                        }
+                        current = range.front;
+                    }
+                }
+            }
+
+            SubRangeElement front()
+            {
+                return current[index];
+            }
+
+            bool empty() @property
+            {
+                if(wasEmpty) return true;
+                return index >= current.length && range.empty;
+            }
+
+            void popFront()
+            {
+                index++;
+
+                if(index >= current.length)
+                {
+                    range.popFront();
+                    if(!range.empty)
+                    {
+                        index = 0;
+                        current = range.front();
+                    }
+                }
+            }
+        }
+    } 
+    else
+    {
+        alias typeof(SubRange.front) SubRangeElement;
+
+        struct Result
+        {
+            private SubRange current;
+            bool wasEmpty = false;
+
+            this(ref Range range)
+            {
+                if(range.empty)
+                    wasEmpty = true;
+                else
+                    current = range.front;
+            }
+
+            SubRangeElement front()
+            {
+                return current.front;
+            }
+
+            bool empty() @property
+            {
+                if(wasEmpty) return true;
+                return current.empty && range.empty;
+            }
+
+            void popFront()
+            {
+                current.popFront();
+
+                while(current.empty)
+                {
+                    range.popFront();
+                    if(!range.empty)
+                        current = range.front();
+                    else
+                        break;
+                }
+            }
+        }
+    }
+
+    return Result(range);
+}
+
+unittest
+{
+    //static assert(isInputRange!(flatten([[0], [1]])));
+    //assert(flatten([[0, 1, 2], [3, 4, 5]]).equals([0, 1, 2, 3, 4, 5]));
+
+    auto first = DList!int([0, 1, 2]);
+    auto second = DList!int([3, 4, 5]);
+    
+    assert(flatten(DList!(DList!(int).Range)([first[], second[]])[]).equal([0, 1, 2, 3, 4, 5]));
+    assert(flatten(DList!(DList!(int).Range)()[]).empty);
+    assert(flatten(map!"[a, a*a]"([1, 2, 3])).equal([1, 1, 2, 4, 3, 9]));
 }

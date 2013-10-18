@@ -876,9 +876,6 @@ Matrix!3 rotationMtrx3(float pitch, float yaw, float roll)
 */
 Matrix!4 projection(Radian fovy, float aspect, float zNear, float zFar)
 {
-    import std.stdio;
-    //  writeln(fovy);
-
     float top = zNear*tan(fovy/2.0f);
     float right = top / aspect;
 
