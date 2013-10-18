@@ -29,9 +29,10 @@ import borey.log;
 */
 class BoreyException : Exception 
 {
-    this(lazy string msg)
+    this(lazy string msg, 
+        string file = __FILE__, size_t line = __LINE__)
     {
-        super(msg);
+        super(msg, file, line);
     }
 }
 
@@ -41,10 +42,11 @@ class BoreyException : Exception
 */
 class BoreyLoggedException : BoreyException
 {
-    this(shared const ILogger logger, lazy string msg)
+    this(shared const ILogger logger, lazy string msg,
+        string file = __FILE__, size_t line = __LINE__)
     {
         logger.logFatal(msg);
-        super(msg);
+        super(msg, file, line);
     }
 }
 
