@@ -17,7 +17,7 @@
                 { 
                     "name": "Dub unittests",
                     "working_dir": "$project_path",
-                    "cmd": ["dub", "build", "--build=unittest"]
+                    "cmd": ["dub", "build", "--config=unittest", "--build=unittest"]
                 },
                 { 
                     "name": "Debug example",

@@ -28,10 +28,16 @@ import borey.exception;
 import borey.constants;
 import borey.log;
 import borey.stdlog;
+import borey.video.driver;
+import borey.video.opengldriver;
 import borey.video.window;
 import borey.video.glfwwindow;
 import borey.video.monitor;
 import borey.video.glfwmonitor;
+import borey.scene.manager;
+import borey.scene.simplemanager;
+import borey.resource.manager;
+import borey.resource.simplemanager;
 import borey.util.common;
 import derelict.glfw3.glfw3;
 import derelict.util.exception;
@@ -99,6 +105,11 @@ class SimpleBoreyCore : IBoreyCore
             throw new BoreyLoggedException(mLogger, "Failed to initialize GLFW3 library!");
         }
         mLogger.logNotice("[SimpleCore]: GLFW3 library initialized.");
+
+        mVideoDriver = new OpenGlDriver(mLogger);
+        mResourceManager = new shared SimpleResourceManager(mLogger);
+        mResourceManager.registerDefaultPacks();
+        mSceneManager = new shared SimpleSceneManager(mLogger);
     }
 
     void terminate()
@@ -114,6 +125,14 @@ class SimpleBoreyCore : IBoreyCore
     shared(ILogger) logger() @property
     {
         return mLogger;
+    }
+
+    /**
+    *   Returns current resource manager.
+    */
+    shared(IResourceManager) resourceManager() @property
+    {
+        return mResourceManager;
     }
 
     /**
@@ -164,7 +183,8 @@ class SimpleBoreyCore : IBoreyCore
         {
             mWindow.setContexCurrent();
         }
-
+        mVideoDriver.initialize();
+        
         return mWindow;
     }
 
@@ -319,6 +339,7 @@ class SimpleBoreyCore : IBoreyCore
     {
         while(!mWindow.shouldBeClosed && !shouldExit)
         {
+            mVideoDriver.draw(mSceneManager);
             mWindow.swapBuffers();
             pollEvents();
         }
@@ -327,6 +348,16 @@ class SimpleBoreyCore : IBoreyCore
             mWindow.closeDelegate()(mWindow);
     }
 
+    IVideoDriver videoDriver() @property
+    {
+        return mVideoDriver;
+    }
+
+    shared(ISceneManager) sceneManager() @property
+    {
+        return mSceneManager;
+    }
+    
     /**
     *   Returns current delegate for on change events.
     *   See_also: onMonitorChangeCallback(OnMonitorChangeDelegate)
@@ -339,6 +370,9 @@ class SimpleBoreyCore : IBoreyCore
     protected
     {
         IWindow mWindow;
+        IVideoDriver mVideoDriver;
+        shared ISceneManager mSceneManager;
+        shared SimpleResourceManager mResourceManager;
         static shared ILogger mLogger;
         bool mShouldExit = false;
     }

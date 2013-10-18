@@ -24,8 +24,11 @@ module borey.core;
 @safe:
 
 import borey.log;
+import borey.video.driver;
 import borey.video.window;
 import borey.video.monitor;
+import borey.scene.manager;
+import borey.resource.manager;
 import std.range;
 
 /**
@@ -61,6 +64,21 @@ interface IBoreyCore
     *   Get default logger.
     */
     shared(ILogger) logger() @property;
+
+    /**
+    *   Returns video driver used by this core.
+    */
+    IVideoDriver videoDriver() @property;
+
+    /**
+    *   Returns current scene manager.
+    */
+    shared(ISceneManager) sceneManager() @property;
+
+    /**
+    *   Returns current resource manager.
+    */
+    shared(IResourceManager) resourceManager() @property;
 
     /**
     *   Range of created windows.
