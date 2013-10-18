@@ -53,7 +53,7 @@
             "targetType": "executable",
             "targetPath": "bin",
             "targetName": "borey-tests",
-            "dflags": ["-main"]
+            
         }
     ]
 }

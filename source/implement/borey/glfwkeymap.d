@@ -377,8 +377,7 @@ Key fromGLFWKey(int key) pure nothrow @trusted
             return Key.RIGHT_SUPER;
         case GLFW_KEY_MENU:
             return Key.MENU;
-        /// TODO: fix this when derelict add enum
-        case -1://GLFW_KEY_UNKNOWN:
+        case GLFW_KEY_UNKNOWN:
             goto default;
         default:
             return Key.UNKNOWN;
