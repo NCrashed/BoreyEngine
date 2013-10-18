@@ -42,4 +42,4 @@ dub build
 License
 =======
 
-Engine is publishing under GPLv3 license. See LICENSE file.
+Engine is publishing under Boost license. See LICENSE file.
