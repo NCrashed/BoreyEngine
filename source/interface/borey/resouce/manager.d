@@ -31,6 +31,7 @@ module borey.resource.manager;
 
 import borey.exception;
 import borey.log;
+import borey.resource.archivemanager;
 import borey.resource.fabric;
 import borey.resource.pack;
 import borey.resource.item;
@@ -188,6 +189,12 @@ interface IResourceManager
         *   within local storage.
         */
         void registerDefaultPacks();
+
+        /**
+        *   Returns archive manager currently in use.
+        *   Warning: is not thread safe!
+        */
+        IArchiveManager archiveManager() @property;
 
         /**
         *   Returns: available resource types to be loaded.

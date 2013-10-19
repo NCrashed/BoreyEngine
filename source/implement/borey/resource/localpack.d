@@ -54,13 +54,14 @@ class LocalResourcePack : IResourcePack
     *   Params:
     *   logger = logger to use,
     *   name = resource pack name,
-    *   path = resource pack location to open archive
+    *   archive = resource pack base archive
     */
-    this(shared ILogger logger, string name, string path)
+    this(shared ILogger logger, string name, IArchive archive)
     {
         mLogger = logger;
         mName = name;
-        mPath = path;
+        mPath = archive.name;
+        mArchive = archive;
     }
 
     /// Returns name of resource pack
@@ -85,7 +86,17 @@ class LocalResourcePack : IResourcePack
     }
 
     /// Returns underlying archive
-    IArchive archive() @property; ///TODO: HEEEEEEEEEEEEEEEEERRRRRRRRREEEEEEEEEEEEEE
+    IArchive archive() @property
+    {
+        return mArchive;
+    }
+
+    // добавить фабрику архивов, которая по пути определяет подходящий тип архива
+    // ftp:// http:// префиксы -> архив для удаленных ресурсов
+    // *.zip -> архив для зип архивов
+    // папка -> дефолт архив
+    // Функции определения типа архива описать в самом архиве, порядок регистрации
+    // типов архивов определяет их приоритет. Дать возможность пользователю их регистрировать.
 
     /**
     *   Checks if resource pack contains resource name in
@@ -211,6 +222,7 @@ class LocalResourcePack : IResourcePack
     {
         string mName;
         string mPath;
+        IArchive mArchive;
         shared ILogger mLogger;
         DList!IResourceGroup mGroups;
 

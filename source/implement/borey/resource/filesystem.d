@@ -188,3 +188,43 @@ class FileSystemArchive : IArchive
         string mName;
     }
 }
+
+class FileSystemArchiveFabric : IArchiveFabric
+{
+    /// Archive type name
+    /**
+    *   Should be unique to evade archive collisions in
+    *   archive manager.
+    */
+    string name() @property
+    {
+        return "filesystem";
+    }
+
+    /// Detects archive by path
+    /**
+    *   Detects archive by path format. Should return true if particular archive
+    *   type can open the path and work with it content, and should return false
+    *   otherwise.
+    *   For instance, "http://example.com/resources" can be opened by remote archive,
+    *   "/foo/baar" can be opened by filesystem archive (if baar is directory),
+    *   "/foo/media.zip" can be opened by zip arhive and so on.
+    *
+    *   Throwing from this method will be treated as false and logged as warning.
+    */
+    bool isPathCanBeOpened(string path)
+    {
+        return exists(path) && isDir(path);
+    }
+
+    /**
+    *   Creates new instance of particular archive type. Can throw WrongArchiveTypeException
+    *   if isPathCanBeOpened returned false for path.
+    *
+    *   Throws: WrongArhiveTypeException, ArchiveLoadingException
+    */
+    IArchive createInstance(shared ILogger logger, string path)
+    {
+        return new FileSystemArchive(logger, path);
+    }
+}

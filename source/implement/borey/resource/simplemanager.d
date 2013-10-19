@@ -34,6 +34,9 @@ module borey.resource.simplemanager;
 
 import borey.exception;
 import borey.log;
+import borey.resource.archivemanager;
+import borey.resource.simplearchivemanager;
+import borey.resource.filesystem;
 import borey.resource.manager;
 import borey.resource.fabric;
 import borey.resource.pack;
@@ -49,6 +52,16 @@ synchronized class SimpleResourceManager : IResourceManager
     this(shared ILogger logger)
     {
         mLogger = logger;
+        mArchiveManager = new SimpleArchiveManager(logger);
+        mArchiveManager.registerFabric(new FileSystemArchiveFabric());
+    }
+
+    /**
+    *   Returns archive manager currently in use.
+    */
+    IArchiveManager archiveManager() @property
+    {
+        return mArchiveManager;
     }
 
     /**
@@ -58,8 +71,11 @@ synchronized class SimpleResourceManager : IResourceManager
     */
     void registerDefaultPacks()
     {
+        auto archive = mArchiveManager.findByPath(IResourceManager.DEFAULT_RESOURCE_PACK_PATH)
+            .createInstance(logger, IResourceManager.DEFAULT_RESOURCE_PACK_PATH);
+
         auto pack = new LocalResourcePack(mLogger, 
-            IResourceManager.DEFAULT_RESOURCE_PACK, IResourceManager.DEFAULT_RESOURCE_PACK_PATH);
+            IResourceManager.DEFAULT_RESOURCE_PACK, archive);
 
         pack.registerDefaultResourceGroups();
         registerPack(pack);
@@ -227,5 +243,6 @@ synchronized class SimpleResourceManager : IResourceManager
         DList!IResourcePack mPacks;
         IResourceFabric[string] mFabricMap;
         shared(ILogger) mLogger;
+        __gshared IArchiveManager mArchiveManager;
     }
 }

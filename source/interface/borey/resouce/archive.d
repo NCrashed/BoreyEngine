@@ -183,3 +183,59 @@ interface IArchive
     */
     void write(string fullName, Stream stream, bool replace = false);
 }
+
+/**
+*   Thrown when trying to open archive with wrong path. Usually indicates
+*   incorrect isPathCanBeOpened realization.
+*/
+class WrongArchiveTypeException : BoreyLoggedException
+{
+    /// Problem path
+    string path;
+    /// Problem archive fabric
+    IArchiveFabric fabric;
+
+    this(shared ILogger logger, IArchiveFabric fabric, string path,
+        string file = __FILE__, size_t line = __LINE__)
+    {
+        this.path = path;
+        this.fabric = fabric;
+        super(logger, text("Cannot open archive type '",fabric.name,"' with path '",path,"'!"), file, line);
+    }
+}
+
+/**
+*   Provides information how to detect archive type by it path. All archive fabrics
+*   should be registered in archive manager to be enabled. Order of registering is
+*   important due manager will take first successeded archive type.
+*/
+interface IArchiveFabric
+{
+    /// Archive type name
+    /**
+    *   Should be unique to evade archive collisions in
+    *   archive manager.
+    */
+    string name() @property;
+
+    /// Detects archive by path
+    /**
+    *   Detects archive by path format. Should return true if particular archive
+    *   type can open the path and work with it content, and should return false
+    *   otherwise.
+    *   For instance, "http://example.com/resources" can be opened by remote archive,
+    *   "/foo/baar" can be opened by filesystem archive (if baar is directory),
+    *   "/foo/media.zip" can be opened by zip arhive and so on.
+    *
+    *   Throwing from this method will be treated as false and logged as warning.
+    */
+    bool isPathCanBeOpened(string path);
+
+    /**
+    *   Creates new instance of particular archive type. Can throw WrongArchiveTypeException
+    *   if isPathCanBeOpened returned false for path.
+    *
+    *   Throws: WrongArhiveTypeException, ArchiveLoadingException
+    */
+    IArchive createInstance(shared ILogger logger, string path);
+}
