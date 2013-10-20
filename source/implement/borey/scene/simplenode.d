@@ -52,7 +52,7 @@ synchronized class SimpleSceneNode : ISceneNode
         mLogger = logger;
         mName = name;
         mParent = parent;
-        mChildren = DList!(shared ISceneNode)();
+        cast()mChildren = DList!(shared ISceneNode)();
     }
 
     /**
@@ -87,7 +87,7 @@ synchronized class SimpleSceneNode : ISceneNode
     */
     InputRange!(shared ISceneNode) children() @property @trusted
     {
-        return innerChildren[].inputRangeObject();
+        return (cast()mChildren)[].inputRangeObject();
     }
 
     /**
@@ -99,27 +99,27 @@ synchronized class SimpleSceneNode : ISceneNode
     */
     InputRange!(shared ISceneNode) find(string name, bool recurse = true) @trusted
     {
-        if(innerChildren.empty)
+        if((cast()mChildren).empty)
         {
             return inputRangeObject(cast(shared(ISceneNode)[])[]);
         }
 
         if(!recurse)
         {
-            return filter!(a => a.name == name)(innerChildren[]).inputRangeObject();
+            return filter!(a => a.name == name)((cast()mChildren)[]).inputRangeObject();
         } 
         else
-        {
+        {   
             DList!(shared ISceneNode) temp;
             foreach(ref child; cast()mChildren)
             {
                 temp.insertBack(child.find(name));
             }
-            return chain(innerChildren[].filter!(a => a.name == name), temp[]).inputRangeObject();
+            return chain((cast()mChildren)[].filter!(a => a.name == name), temp[]).inputRangeObject();
 
             // Workaround, flatten problems with empty ranges
-            //return chain(innerChildren[].filter!(a => a.name == name),
-            //    flatten(innerChildren[].map!(a => a.find(name))) ).inputRangeObject();
+            //return chain(cast()mChildren[].filter!(a => a.name == name),
+            //    flatten(cast()mChildren[].map!(a => a.find(name))) ).inputRangeObject();
         }
     }
 
@@ -131,7 +131,7 @@ synchronized class SimpleSceneNode : ISceneNode
         auto node = new shared SimpleSceneNode(name, this, mLogger);
         node.position = pos;
         node.rotation = rot;
-        innerChildren.insertBack(node);
+        (cast()mChildren).insertBack(node);
         return node;
     }
 
@@ -143,11 +143,11 @@ synchronized class SimpleSceneNode : ISceneNode
     */
     void detachChild(shared ISceneNode node) @trusted
     {
-        auto res = std.algorithm.find(innerChildren[], node);
+        auto res = std.algorithm.find((cast()mChildren)[], node);
         if(res.empty) return;
 
         node.parent = null;
-        innerChildren.remove(res);
+        (cast()mChildren).remove(res);
     }
 
     /**
@@ -158,11 +158,11 @@ synchronized class SimpleSceneNode : ISceneNode
     */
     void attachChild(shared ISceneNode node) @trusted
     {
-        auto res = std.algorithm.find(innerChildren[], node);
+        auto res = std.algorithm.find((cast()mChildren)[], node);
         if(!res.empty) return;
 
         node.parent = this;
-        innerChildren.insertFront(node);
+        (cast()mChildren).insertFront(node);
     }
 
     /**
@@ -235,12 +235,6 @@ synchronized class SimpleSceneNode : ISceneNode
             return mParent.rotation + rotation;
     }
 
-    /// Avoid boilerplate casting everywhere
-    private DList!(shared ISceneNode) innerChildren() @property @trusted
-    {
-        return cast()mChildren;
-    }
-
     protected
     {
         string mName;
@@ -274,7 +268,7 @@ synchronized class SimpleSceneNode : ISceneNode
     auto b2Node = cNode.createChild("b");
 
     auto a3Node = a2Node.createChild("a");
-    
+
     assert(root.find("a").map!"a.name".equal(["a", "a", "a"]));
     assert(root.find("b").map!"a.name".equal(["b", "b"]));
     assert(root.find("c", false).map!"a.name".equal(["c"]));

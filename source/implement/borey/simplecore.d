@@ -115,6 +115,7 @@ class SimpleBoreyCore : IBoreyCore
         {
             throw new BoreyLoggedException(mLogger, "Failed to initialize GLFW3 library!");
         }
+        glfwWasInited = true;
         mLogger.logNotice("[SimpleCore]: GLFW3 library initialized.");
 
         mVideoDriver = new OpenGlDriver(mLogger);
@@ -399,8 +400,10 @@ class SimpleBoreyCore : IBoreyCore
     }
 }
 
-/// TODO: it is not clean, if nobody creates core it fails.
+private bool glfwWasInited = false;
+
 @trusted shared static ~this() 
 {
-    glfwTerminate();
+    if(glfwWasInited)
+        glfwTerminate();
 }
