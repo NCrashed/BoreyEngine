@@ -114,8 +114,3 @@ extern(C)
         return new SimpleBoreyCore();
     }
 }
-
-version(unittest)
-{
-    void main() {}
-}

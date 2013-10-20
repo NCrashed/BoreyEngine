@@ -42,18 +42,17 @@
     "configurations": 
     [
         {
-            "name": "application",
-             
+            "name": "library",
             "targetType": "library",
             "targetPath": "bin",
-            "targetName": "borey-engine",
+            "targetName": "borey-engine"
         },
         {
             "name": "unittest",
             "targetType": "executable",
             "targetPath": "bin",
             "targetName": "borey-tests",
-            
+            "dflags": ["-main"]
         }
     ]
 }
